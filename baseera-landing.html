@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>بصيرة البيانات — تحليل يقود إلى عملاء</title>
+<meta name="description" content="نحلل بياناتك الحالية ونحوّلها إلى خريطة واضحة تساعدك على إيجاد العملاء المناسبين وزيادة المبيعات." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@500;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#10131f;
+    --ink-soft:#181d30;
+    --ink-line:#2a3049;
+    --paper:#eef1ef;
+    --card:#ffffff;
+    --line:#dfe4e0;
+    --muted:#667085;
+    --text:#141826;
+    --text-inverse:#eef1f6;
+    --muted-inverse:#a6adc4;
+    --gold:#d9a441;
+    --gold-deep:#b9822a;
+    --gold-soft:#f4e3bd;
+    --teal:#2e9c93;
+    --teal-soft:#d7ece9;
+    --radius-lg:1.75rem;
+    --radius-md:1.25rem;
+    --radius-sm:0.85rem;
+    --font-display:'Noto Kufi Arabic', system-ui, sans-serif;
+    --font-body:'IBM Plex Sans Arabic', system-ui, sans-serif;
+    --font-mono:'IBM Plex Mono', 'Noto Kufi Arabic', monospace;
+    --shadow-card:0 20px 60px rgba(16,19,31,0.08);
+    --shadow-dark:0 24px 70px rgba(0,0,0,0.35);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--text);
+    font-family:var(--font-body);
+    -webkit-font-smoothing:antialiased;
+  }
+  img,svg{display:block;max-width:100%;}
+  a{color:inherit;text-decoration:none;}
+  ul{list-style:none;margin:0;padding:0;}
+  button{font-family:inherit;}
+
+  .wrap{max-width:1180px;margin:0 auto;padding-inline:1.5rem;}
+  .eyebrow{
+    font-family:var(--font-mono);
+    font-size:0.78rem;
+    font-weight:600;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+  }
+
+  /* ---------------- Header ---------------- */
+  header.site{
+    position:sticky; top:0; z-index:50;
+    background:rgba(238,241,239,0.86);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line);
+  }
+  .header-row{
+    display:flex; align-items:center; justify-content:space-between;
+    padding-block:1rem;
+  }
+  .brand{display:flex; align-items:center; gap:0.75rem;}
+  .brand-mark{
+    width:2.75rem; height:2.75rem; border-radius:0.9rem;
+    background:var(--ink);
+    display:grid; place-items:center;
+    position:relative; overflow:hidden;
+  }
+  .brand-mark::after{
+    content:"";
+    position:absolute; inset:0;
+    background:radial-gradient(circle at 30% 30%, rgba(217,164,65,0.55), transparent 60%);
+  }
+  .brand-mark span{position:relative; color:var(--gold); font-family:var(--font-display); font-weight:900; font-size:1.2rem;}
+  .brand-text{display:flex; flex-direction:column; line-height:1.1;}
+  .brand-text strong{font-family:var(--font-display); font-weight:800; font-size:1.05rem; letter-spacing:-0.01em;}
+  .brand-text small{margin-top:0.3rem; font-size:0.72rem; font-weight:600; color:var(--muted); font-family:var(--font-mono);}
+
+  nav.primary{display:flex; align-items:center; gap:0.25rem;}
+  nav.primary a{
+    padding:0.55rem 1rem; border-radius:0.75rem;
+    font-size:0.9rem; font-weight:600; color:var(--text);
+    transition:background .2s ease, color .2s ease;
+  }
+  nav.primary a:hover{background:var(--ink); color:var(--text-inverse);}
+  nav.primary a.is-active{background:var(--ink); color:var(--text-inverse);}
+
+  .menu-toggle{
+    display:none;
+    border:1px solid var(--line); background:var(--card);
+    border-radius:0.75rem; padding:0.55rem 0.9rem;
+    font-weight:700; font-size:0.85rem; cursor:pointer;
+  }
+
+  /* ---------------- Hero ---------------- */
+  section.hero{
+    background:var(--ink);
+    color:var(--text-inverse);
+    padding-block:4.5rem 3.5rem;
+    position:relative;
+    overflow:hidden;
+    border-bottom:1px solid var(--ink-line);
+  }
+  section.hero::before{
+    content:"";
+    position:absolute; inset:0;
+    background:
+      radial-gradient(circle at 85% 0%, rgba(217,164,65,0.14), transparent 40%),
+      radial-gradient(circle at 10% 90%, rgba(46,156,147,0.12), transparent 45%);
+    pointer-events:none;
+  }
+  .hero-inner{position:relative; text-align:center;}
+  .hero-badge{
+    display:inline-flex; align-items:center; gap:0.5rem;
+    border:1px solid var(--ink-line);
+    background:rgba(255,255,255,0.03);
+    color:var(--gold-soft);
+    padding:0.5rem 1.1rem; border-radius:999px;
+    font-size:0.82rem; font-weight:600; margin-bottom:1.75rem;
+  }
+  .hero-badge .dot{width:6px; height:6px; border-radius:999px; background:var(--gold);}
+  h1.hero-title{
+    font-family:var(--font-display);
+    font-weight:800;
+    font-size:clamp(2.1rem, 4.4vw, 3.6rem);
+    line-height:1.28;
+    letter-spacing:-0.01em;
+    max-width:900px;
+    margin:0 auto;
+  }
+  h1.hero-title em{
+    font-style:normal;
+    color:var(--gold);
+  }
+  .hero-sub{
+    max-width:640px; margin:1.6rem auto 0;
+    font-size:1.08rem; line-height:1.9;
+    color:var(--muted-inverse); font-weight:500;
+  }
+  .hero-cta{display:flex; justify-content:center; gap:0.9rem; margin-top:2.2rem; flex-wrap:wrap;}
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:0.5rem;
+    padding:0.95rem 1.9rem; border-radius:0.9rem;
+    font-weight:700; font-size:0.95rem;
+    transition:transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
+    border:1px solid transparent; cursor:pointer;
+  }
+  .btn:hover{transform:translateY(-2px);}
+  .btn-gold{background:var(--gold); color:var(--ink);}
+  .btn-gold:hover{background:var(--gold-deep); box-shadow:0 16px 32px rgba(217,164,65,0.25);}
+  .btn-ghost-dark{border-color:var(--ink-line); color:var(--text-inverse); background:transparent;}
+  .btn-ghost-dark:hover{border-color:var(--gold); color:var(--gold);}
+  .btn-light{background:var(--card); color:var(--ink);}
+  .btn-light:hover{background:var(--gold-soft);}
+  .btn-outline-light{border-color:rgba(255,255,255,0.28); color:var(--text-inverse); background:transparent;}
+  .btn-outline-light:hover{border-color:var(--gold); color:var(--gold);}
+
+  /* --- Signature diagram: scattered data -> focused customer --- */
+  .signature{
+    margin-top:3.2rem;
+    border:1px solid var(--ink-line);
+    background:var(--ink-soft);
+    border-radius:var(--radius-lg);
+    padding:1.6rem 1.4rem 1.2rem;
+    position:relative;
+  }
+  .signature-labels{
+    display:flex; justify-content:space-between;
+    font-family:var(--font-mono); font-size:0.75rem; font-weight:600;
+    color:var(--muted-inverse); padding-inline:0.4rem; margin-bottom:0.4rem;
+  }
+  .signature-labels .tag-scatter{color:var(--teal);}
+  .signature-labels .tag-focus{color:var(--gold);}
+  .sig-dot{fill:var(--teal); opacity:0.85;}
+  .sig-dot.alt{fill:#8fb9c9;}
+  .sig-line{
+    stroke:var(--gold);
+    stroke-width:1;
+    fill:none;
+    opacity:0.55;
+    stroke-dasharray:220;
+    stroke-dashoffset:220;
+    animation:draw-line 1.8s ease forwards;
+  }
+  .sig-ring{fill:none; stroke:var(--gold); opacity:0.5;}
+  .sig-core{fill:var(--gold);}
+  .sig-pulse{
+    fill:none; stroke:var(--gold); stroke-width:1.4; opacity:0.55;
+    transform-origin:80px 200px;
+    animation:pulse-ring 2.6s ease-out infinite;
+  }
+  @keyframes draw-line{to{stroke-dashoffset:0;}}
+  @keyframes pulse-ring{
+    0%{transform:scale(0.6); opacity:0.6;}
+    80%{transform:scale(1.9); opacity:0;}
+    100%{transform:scale(1.9); opacity:0;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .sig-line{animation:none; stroke-dashoffset:0;}
+    .sig-pulse{animation:none; opacity:0;}
+  }
+
+  .stat-strip{
+    display:grid; grid-template-columns:1fr 1fr;
+    max-width:620px; margin:2.4rem auto 0;
+    border:1px solid var(--ink-line); border-radius:var(--radius-md);
+    overflow:hidden; background:rgba(255,255,255,0.02);
+  }
+  .stat-strip div{padding:1.3rem 1rem; text-align:center;}
+  .stat-strip div + div{border-inline-start:1px solid var(--ink-line);}
+  .stat-strip strong{
+    display:block; font-family:var(--font-mono); font-size:1.7rem; font-weight:600; color:var(--gold);
+  }
+  .stat-strip span{display:block; margin-top:0.35rem; font-size:0.8rem; color:var(--muted-inverse); font-weight:600;}
+
+  /* ---------------- Section shell ---------------- */
+  section{padding-block:5.5rem;}
+  .section-head{max-width:640px; margin:0 auto 3.2rem; text-align:center;}
+  .section-head .eyebrow{color:var(--teal);}
+  .section-head h2{
+    font-family:var(--font-display); font-weight:800;
+    font-size:clamp(1.7rem, 3vw, 2.5rem);
+    margin:0.7rem 0 0; letter-spacing:-0.01em;
+  }
+  .section-head p{margin-top:1.1rem; color:var(--muted); font-size:1.02rem; line-height:1.9; font-weight:500;}
+  section.on-paper{background:var(--paper);}
+  section.on-white{background:var(--card);}
+
+  /* ---------------- Services / benefits ---------------- */
+  .benefits-grid{
+    display:grid; grid-template-columns:repeat(2, 1fr);
+    gap:1.25rem; max-width:900px; margin:0 auto;
+  }
+  .benefit-card{
+    background:var(--card); border:1px solid var(--line);
+    border-radius:var(--radius-md); padding:1.9rem;
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .benefit-card:hover{transform:translateY(-4px); box-shadow:var(--shadow-card);}
+  .benefit-icon{
+    width:2.9rem; height:2.9rem; border-radius:0.85rem;
+    background:var(--teal-soft); display:grid; place-items:center; margin-bottom:1.1rem;
+  }
+  .benefit-icon svg{width:1.4rem; height:1.4rem; stroke:var(--teal); fill:none; stroke-width:1.7;}
+  .benefit-card h3{font-family:var(--font-display); font-weight:700; font-size:1.12rem; margin:0; line-height:1.6;}
+  .benefit-card p{margin-top:0.7rem; color:var(--muted); font-size:0.95rem; line-height:1.85; font-weight:500;}
+
+  /* ---------------- Pricing ---------------- */
+  .pricing-grid{
+    display:grid; grid-template-columns:repeat(2, 1fr);
+    gap:1.4rem; max-width:900px; margin:0 auto;
+  }
+  .plan{
+    position:relative;
+    background:var(--card); border:1px solid var(--line);
+    border-radius:var(--radius-lg); padding:2.1rem;
+    display:flex; flex-direction:column;
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .plan:hover{transform:translateY(-4px); box-shadow:var(--shadow-card);}
+  .plan.featured{border-color:var(--ink);}
+  .plan-tag{
+    display:inline-flex; align-self:flex-start;
+    font-family:var(--font-mono); font-size:0.72rem; font-weight:600;
+    padding:0.4rem 0.85rem; border-radius:999px; margin-bottom:1.3rem;
+  }
+  .plan.featured .plan-tag{background:var(--gold-soft); color:var(--gold-deep);}
+  .plan:not(.featured) .plan-tag{background:var(--teal-soft); color:var(--teal);}
+  .plan h3{font-family:var(--font-display); font-weight:700; font-size:1.35rem; margin:0;}
+  .plan p.desc{margin-top:0.85rem; color:var(--muted); font-size:0.95rem; line-height:1.85; min-height:4.6rem; font-weight:500;}
+  .plan .price-row{display:flex; align-items:flex-end; gap:0.5rem; margin-top:1.2rem;}
+  .plan .price{font-family:var(--font-mono); font-weight:600; font-size:2.6rem; color:var(--ink); letter-spacing:-0.01em;}
+  .plan .period{color:var(--muted); font-size:0.85rem; font-weight:600; padding-bottom:0.4rem;}
+  .plan ul{margin-top:1.5rem; display:grid; gap:0.6rem;}
+  .plan li{
+    display:flex; align-items:flex-start; gap:0.6rem;
+    font-size:0.9rem; font-weight:600; color:var(--text);
+    background:var(--paper); border-radius:0.7rem; padding:0.75rem 0.9rem;
+  }
+  .plan li::before{content:"—"; color:var(--gold-deep); font-weight:700; flex-shrink:0;}
+  .plan .btn{margin-top:1.7rem; width:100%;}
+
+  /* ---------------- Why / process ---------------- */
+  section.why{background:var(--ink); color:var(--text-inverse);}
+  .why-grid{display:grid; grid-template-columns:0.95fr 1.05fr; gap:3rem; align-items:center;}
+  .why-copy .eyebrow{color:var(--gold);}
+  .why-copy h2{
+    font-family:var(--font-display); font-weight:800;
+    font-size:clamp(1.7rem, 3vw, 2.4rem); margin:0.8rem 0 0; line-height:1.4;
+  }
+  .why-copy p{margin-top:1.2rem; color:var(--muted-inverse); font-size:1rem; line-height:1.9; font-weight:500;}
+
+  .steps{position:relative; display:grid; gap:1.4rem;}
+  .steps::before{
+    content:"";
+    position:absolute; top:1.6rem; bottom:1.6rem; right:1.85rem;
+    width:1px;
+    background:linear-gradient(to bottom, var(--gold), transparent 92%);
+  }
+  .step{position:relative; display:flex; gap:1.3rem; align-items:flex-start;}
+  .step-num{
+    position:relative; z-index:1; flex-shrink:0;
+    width:3.7rem; height:3.7rem; border-radius:50%;
+    background:var(--ink-soft); border:1px solid var(--gold);
+    display:grid; place-items:center;
+    font-family:var(--font-mono); font-weight:600; color:var(--gold); font-size:1rem;
+  }
+  .step h3{font-family:var(--font-display); font-weight:700; font-size:1.08rem; margin:0.35rem 0 0; color:var(--text-inverse);}
+  .step p{margin-top:0.5rem; color:var(--muted-inverse); font-size:0.92rem; line-height:1.8; font-weight:500;}
+
+  /* ---------------- FAQ ---------------- */
+  .faq-list{max-width:760px; margin:0 auto; display:grid; gap:0.9rem;}
+  details.faq{
+    background:var(--card); border:1px solid var(--line);
+    border-radius:var(--radius-md); padding:0.3rem 1.5rem;
+  }
+  details.faq summary{
+    list-style:none; cursor:pointer;
+    display:flex; align-items:center; justify-content:space-between; gap:1rem;
+    padding-block:1.25rem; font-family:var(--font-display); font-weight:700; font-size:1.02rem;
+  }
+  details.faq summary::-webkit-details-marker{display:none;}
+  .faq-icon{
+    flex-shrink:0; width:2rem; height:2rem; border-radius:50%;
+    background:var(--teal-soft); color:var(--teal);
+    display:grid; place-items:center; font-family:var(--font-mono); font-weight:700;
+    transition:transform .2s ease;
+  }
+  details.faq[open] .faq-icon{transform:rotate(45deg); background:var(--gold-soft); color:var(--gold-deep);}
+  details.faq p{margin:0 0 1.4rem; color:var(--muted); font-size:0.95rem; line-height:1.85; font-weight:500;}
+
+  /* ---------------- Contact ---------------- */
+  section.contact{background:var(--ink); color:var(--text-inverse);}
+  .contact-grid{display:grid; grid-template-columns:0.9fr 1.1fr; gap:2.5rem; align-items:stretch;}
+  .contact-copy{display:flex; flex-direction:column; justify-content:center;}
+  .contact-copy .eyebrow{color:var(--teal);}
+  .contact-copy h2{font-family:var(--font-display); font-weight:800; font-size:clamp(1.6rem,2.8vw,2.3rem); margin:0.8rem 0 0; line-height:1.4;}
+  .contact-copy p{margin-top:1.1rem; color:var(--muted-inverse); font-size:1rem; line-height:1.9; font-weight:500;}
+  .contact-actions{display:flex; gap:0.8rem; margin-top:1.8rem; flex-wrap:wrap;}
+
+  form.contact-form{
+    background:var(--card); border-radius:var(--radius-lg);
+    padding:1.8rem; box-shadow:var(--shadow-dark);
+    display:grid; gap:1rem;
+  }
+  .field label{
+    display:block; font-size:0.85rem; font-weight:700; color:var(--ink); margin-bottom:0.5rem;
+  }
+  .field input, .field textarea{
+    width:100%; border:1px solid var(--line); background:var(--paper);
+    border-radius:0.85rem; padding:0.85rem 1rem;
+    font-family:var(--font-body); font-size:0.92rem; font-weight:500; color:var(--text);
+    outline:none; transition:border-color .2s ease, box-shadow .2s ease;
+  }
+  .field textarea{resize:none;}
+  .field input:focus, .field textarea:focus{
+    border-color:var(--gold); box-shadow:0 0 0 4px rgba(217,164,65,0.18);
+  }
+  form.contact-form .btn{width:100%; margin-top:0.2rem;}
+
+  /* ---------------- Footer ---------------- */
+  footer.site{background:var(--ink); color:var(--muted-inverse); border-top:1px solid var(--ink-line);}
+  .footer-row{
+    display:flex; align-items:center; justify-content:space-between;
+    padding-block:2rem; gap:1.5rem; flex-wrap:wrap;
+  }
+  .footer-row p{font-size:0.85rem; font-weight:600; margin:0;}
+  .footer-nav{display:flex; flex-wrap:wrap; gap:0.4rem 1.5rem;}
+  .footer-nav a{font-family:var(--font-mono); font-size:0.72rem; font-weight:600; letter-spacing:0.04em; text-transform:uppercase; transition:color .2s ease;}
+  .footer-nav a:hover{color:var(--gold);}
+
+  /* ---------------- Responsive ---------------- */
+  @media (max-width: 860px){
+    nav.primary{
+      position:absolute; inset-inline:1.5rem; top:100%;
+      background:var(--card); border:1px solid var(--line);
+      border-radius:1rem; flex-direction:column; align-items:stretch;
+      padding:0.6rem; margin-top:0.5rem;
+      box-shadow:var(--shadow-card);
+      display:none;
+    }
+    nav.primary.open{display:flex;}
+    nav.primary a{text-align:center;}
+    .menu-toggle{display:inline-flex;}
+    .benefits-grid, .pricing-grid{grid-template-columns:1fr;}
+    .why-grid, .contact-grid{grid-template-columns:1fr;}
+    .steps::before{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap header-row">
+    <a href="#home" class="brand" aria-label="بصيرة البيانات">
+      <span class="brand-mark"><span>ب</span></span>
+      <span class="brand-text">
+        <strong>بصيرة البيانات</strong>
+        <small>DATA&nbsp;→&nbsp;CLARITY</small>
+      </span>
+    </a>
+
+    <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="siteNav">القائمة</button>
+
+    <nav class="primary" id="siteNav">
+      <a href="#home" class="is-active">الرئيسية</a>
+      <a href="#services">الخدمات</a>
+      <a href="#pricing">الباقات</a>
+      <a href="#why">لماذا نحن</a>
+      <a href="#faq">الأسئلة</a>
+      <a href="#contact">تواصل</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero" id="home">
+  <div class="wrap hero-inner">
+    <span class="hero-badge"><span class="dot"></span> خدمة تحليل بيانات لأصحاب المشاريع والشركات الصغيرة</span>
+
+    <h1 class="hero-title">بياناتك تعرف من هو عميلك القادم<br><em>ونحن نُريك الطريق إليه</em></h1>
+
+    <p class="hero-sub">
+      نحلّل بيانات مبيعاتك وحملاتك وجمهورك، وننظّم المتفرق منها، ونحوّل كل ذلك إلى خريطة واضحة
+      تُظهر أفضل عملائك، أماكن تواجدهم، والرسالة التي تدفعهم للشراء.
+    </p>
+
+    <div class="hero-cta">
+      <a href="#pricing" class="btn btn-gold">اطّلع على الباقات الشهرية</a>
+      <a href="#why" class="btn btn-ghost-dark">شاهد كيف نعمل</a>
+    </div>
+
+    <div class="signature" aria-hidden="true">
+      <div class="signature-labels">
+        <span class="tag-scatter">● بيانات مبعثرة</span>
+        <span class="tag-focus">عميلك المناسب ●</span>
+      </div>
+      <svg viewBox="0 0 600 240" width="100%" height="auto" role="img" aria-label="رسم توضيحي يحوّل نقاط بيانات متفرقة إلى نقطة تركيز واحدة">
+        <!-- convergence lines -->
+        <g>
+          <path class="sig-line" d="M540,40 C400,60 220,140 80,120" style="animation-delay:.05s"/>
+          <path class="sig-line" d="M520,90 C380,90 220,110 80,120" style="animation-delay:.15s"/>
+          <path class="sig-line" d="M505,150 C370,130 220,120 80,120" style="animation-delay:.25s"/>
+          <path class="sig-line" d="M470,190 C350,160 220,130 80,120" style="animation-delay:.35s"/>
+          <path class="sig-line" d="M430,55 C330,75 210,105 80,120" style="animation-delay:.45s"/>
+          <path class="sig-line" d="M380,200 C300,170 210,140 80,120" style="animation-delay:.55s"/>
+          <path class="sig-line" d="M330,35 C280,60 200,95 80,120" style="animation-delay:.65s"/>
+          <path class="sig-line" d="M300,175 C260,155 190,135 80,120" style="animation-delay:.75s"/>
+        </g>
+        <!-- scattered data dots -->
+        <g>
+          <circle class="sig-dot" cx="540" cy="40" r="5"/>
+          <circle class="sig-dot alt" cx="520" cy="90" r="4"/>
+          <circle class="sig-dot" cx="505" cy="150" r="6"/>
+          <circle class="sig-dot alt" cx="470" cy="190" r="4"/>
+          <circle class="sig-dot" cx="430" cy="55" r="4.5"/>
+          <circle class="sig-dot alt" cx="380" cy="200" r="5"/>
+          <circle class="sig-dot" cx="330" cy="35" r="4"/>
+          <circle class="sig-dot alt" cx="300" cy="175" r="4.5"/>
+          <circle class="sig-dot" cx="560" cy="140" r="3.5"/>
+          <circle class="sig-dot alt" cx="245" cy="70" r="4"/>
+        </g>
+        <!-- focus target -->
+        <circle class="sig-pulse" cx="80" cy="120" r="14"/>
+        <circle class="sig-ring" cx="80" cy="120" r="26"/>
+        <circle class="sig-ring" cx="80" cy="120" r="15"/>
+        <circle class="sig-core" cx="80" cy="120" r="5"/>
+      </svg>
+    </div>
+
+    <div class="stat-strip">
+      <div><strong>27 يوم</strong><span>دورة تحليل دورية</span></div>
+      <div><strong>0 تعقيد</strong><span>بدون أنظمة تقنية معقدة</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="on-white" id="services">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">الخدمات</span>
+      <h2>لماذا تحتاج خدمة تحليل البيانات؟</h2>
+      <p>لأن البيانات الموجودة لديك قد تحتوي على إجابات مهمة: من يشتري؟ لماذا يتوقف؟ أي قناة تسويقية تعمل؟ وأين تضيع الفرص؟</p>
+    </div>
+
+    <div class="benefits-grid">
+      <div class="benefit-card">
+        <div class="benefit-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></div>
+        <h3>تحليل يوضح أين يوجد العميل المناسب</h3>
+        <p>نحوّل بيانات المبيعات، الحملات، والجمهور إلى مؤشرات واضحة تساعدك على اختيار العملاء الأعلى احتمالًا للشراء.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="4" rx="1"/><rect x="3" y="10" width="12" height="4" rx="1"/><rect x="3" y="16" width="7" height="4" rx="1"/></svg></div>
+        <h3>تقارير جاهزة لاتخاذ القرار</h3>
+        <p>لوحات متابعة مختصرة تعرض الأداء، الفرص، والمخاطر بلغة مفهومة بعيدًا عن التعقيد التقني.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div>
+        <h3>تنظيف وتنظيم البيانات المتفرقة</h3>
+        <p>نجمع الملفات والقوائم من مصادر متعددة، ننظفها، ونبني قاعدة قابلة للبحث والتحليل والاستخدام التجاري.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></div>
+        <h3>خطة نمو مبنية على الأرقام</h3>
+        <p>لا نكتفي بعرض النتائج؛ نقدم توصيات عملية لقنوات التسويق، شرائح العملاء، وأساليب المتابعة المناسبة.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="on-paper" id="pricing">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">الباقات</span>
+      <h2>اختر الباقة المناسبة لمرحلة مشروعك</h2>
+      <p>إذا كانت بياناتك جاهزة نبدأ بالتحليل الشهري مباشرة، وإذا لم تكن جاهزة نؤسس قاعدة بيانات منظمة تساعدك على النمو.</p>
+    </div>
+
+    <div class="pricing-grid">
+      <article class="plan featured">
+        <span class="plan-tag">باقة شهرية متكررة</span>
+        <h3>باقة تحليل البيانات الجاهزة</h3>
+        <p class="desc">مناسبة لصاحب المشروع الذي يمتلك بيانات جاهزة ويريد تحويلها إلى تقارير وقرارات واضحة.</p>
+        <div class="price-row"><span class="price">99$</span><span class="period">/ شهريًا</span></div>
+        <ul>
+          <li>تحليل شامل كل 27 يوم</li>
+          <li>تنظيف وترتيب البيانات المتوفرة</li>
+          <li>تقرير عملي مع توصيات للنمو</li>
+          <li>متابعة شهرية للنتائج</li>
+        </ul>
+        <a href="#contact" class="btn btn-gold">اطلب هذه الباقة</a>
+      </article>
+
+      <article class="plan">
+        <span class="plan-tag">رسوم تأسيس لمرة واحدة</span>
+        <h3>باقة تأسيس قاعدة بيانات</h3>
+        <p class="desc">مناسبة لمن يحتاج بناء وتنظيم قاعدة بيانات قبل البدء بالتحليل الشهري.</p>
+        <div class="price-row"><span class="price">+120$</span><span class="period">/ تأسيس المشروع</span></div>
+        <ul>
+          <li>تصميم هيكل قاعدة البيانات</li>
+          <li>تنظيم مصادر العملاء والمبيعات</li>
+          <li>تجهيز الملفات للتحليل المستمر</li>
+          <li>تحليل ومتابعة شهرية للنتائج مع تقرير عملي</li>
+        </ul>
+        <a href="#contact" class="btn btn-light" style="border:1px solid var(--line);">اطلب هذه الباقة</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="why" id="why">
+  <div class="wrap why-grid">
+    <div class="why-copy">
+      <span class="eyebrow">طريقة العمل</span>
+      <h2>من ملف بيانات عادي إلى قرار تجاري واضح</h2>
+      <p>نركز على الأسئلة التي تهم نمو مشروعك، ثم نحول النتائج إلى خطة قابلة للتطبيق في التسويق والمبيعات وخدمة العملاء.</p>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <span class="step-num">01</span>
+        <div>
+          <h3>ترسل لنا ملفاتك أو مصادر بياناتك الحالية</h3>
+          <p>Excel، Google Sheets، بيانات المتجر، أو أي قوائم متوفرة لديك — بأي شكل كانت.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">02</span>
+        <div>
+          <h3>نحلل جودة البيانات ونحدد الأسئلة التجارية المهمة</h3>
+          <p>نفهم أين تكمن الفجوات، ونركّز التحليل على ما يخدم قرارات النمو الفعلية.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">03</span>
+        <div>
+          <h3>نجهز تقريرًا ولوحة متابعة وتوصيات قابلة للتنفيذ</h3>
+          <p>نتائج واضحة تستخدمها مباشرة في التسويق والمبيعات دون تعقيد إضافي.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="on-white" id="faq">
+  <div class="wrap">
+    <div class="section-head" style="margin-bottom:2.4rem;">
+      <span class="eyebrow">الأسئلة الشائعة</span>
+      <h2>أسئلة يتكرر سؤالنا عنها</h2>
+    </div>
+
+    <div class="faq-list">
+      <details class="faq" open>
+        <summary>ما نوع البيانات التي يمكن تحليلها؟<span class="faq-icon">+</span></summary>
+        <p>يمكن تحليل بيانات المبيعات، العملاء، الحملات الإعلانية، ملفات Excel، نماذج التواصل، بيانات المتجر الإلكتروني، أو أي قوائم تساعد في فهم السوق والعملاء.</p>
+      </details>
+      <details class="faq">
+        <summary>هل أحتاج إلى نظام تقني معقد للبدء؟<span class="faq-icon">+</span></summary>
+        <p>لا. يمكن البدء بملفات بسيطة مثل Excel أو Google Sheets. المهم أن تكون لديك بيانات أولية أو هدف واضح تريد الوصول إليه.</p>
+      </details>
+      <details class="faq">
+        <summary>كيف تساعدني الخدمة في إيجاد عملاء؟<span class="faq-icon">+</span></summary>
+        <p>نحدد الشرائح الأكثر قيمة، مصادر العملاء الأفضل، الأنماط التي تشير إلى نية الشراء، ثم نقترح طريقة متابعة وتسويق مناسبة لكل شريحة.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="contact" id="contact">
+  <div class="wrap contact-grid">
+    <div class="contact-copy">
+      <span class="eyebrow">ابدأ الآن</span>
+      <h2>أرسل بياناتك أو فكرتك وسنقترح لك أول فرصة نمو واضحة</h2>
+      <p>اجعل التواصل مباشرًا: تملأ طلبًا مختصرًا، ونرد عليك بخطة تحليل أولية تناسب مشروعك وهدفك التجاري.</p>
+      <div class="contact-actions">
+        <a href="https://wa.me/9647838927373?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D8%8C%20%D8%A3%D8%B1%D9%8A%D8%AF%20%D8%A7%D9%84%D8%A7%D8%B4%D8%AA%D8%B1%D8%A7%D9%83%20%D9%81%D9%8A%20%D8%A5%D8%AD%D8%AF%D9%89%20%D8%A8%D8%A7%D9%82%D8%A7%D8%AA%20%D8%AA%D8%AD%D9%84%D9%8A%D9%84%20%D8%A7%D9%84%D8%A8%D9%8A%D8%A7%D9%86%D8%A7%D8%AA" target="_blank" rel="noreferrer" class="btn btn-light">
+          <svg viewBox="0 0 32 32" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M16.02 3.2A12.72 12.72 0 0 0 5.13 22.5L3.2 29l6.67-1.78A12.74 12.74 0 1 0 16.02 3.2Zm0 2.31a10.43 10.43 0 0 1 8.84 15.99 10.43 10.43 0 0 1-13.87 3.56l-.48-.28-3.96 1.06 1.07-3.84-.31-.5A10.42 10.42 0 0 1 16.02 5.5Zm-4.5 5.46c-.22 0-.58.08-.88.42-.3.33-1.16 1.13-1.16 2.76 0 1.62 1.19 3.19 1.35 3.41.16.22 2.3 3.68 5.67 5.02 2.8 1.12 3.37.9 3.98.84.6-.06 1.96-.8 2.24-1.58.28-.78.28-1.45.2-1.58-.09-.14-.31-.22-.65-.39-.34-.17-1.96-.97-2.27-1.08-.3-.11-.53-.17-.75.17-.22.34-.86 1.08-1.05 1.3-.2.22-.39.25-.72.08-.34-.17-1.42-.52-2.7-1.66-1-.89-1.68-1.99-1.87-2.33-.2-.34-.02-.52.15-.69.15-.15.34-.39.5-.58.17-.2.22-.34.34-.56.11-.22.06-.42-.03-.58-.08-.17-.75-1.8-1.02-2.46-.27-.65-.54-.56-.75-.57h-.57Z"/></svg>
+          اطلب الباقة عبر واتساب
+        </a>
+      </div>
+    </div>
+
+    <form class="contact-form" onsubmit="return handleSubmit(event)">
+      <div class="field">
+        <label for="f-name">الاسم</label>
+        <input id="f-name" type="text" placeholder="اكتب اسمك" required />
+      </div>
+      <div class="field">
+        <label for="f-type">نوع المشروع</label>
+        <input id="f-type" type="text" placeholder="شركة، متجر، خدمة، حملة" />
+      </div>
+      <div class="field">
+        <label for="f-contact">البريد أو الواتساب</label>
+        <input id="f-contact" type="text" placeholder="طريقة التواصل المفضلة" required />
+      </div>
+      <div class="field">
+        <label for="f-goal">ما الهدف الذي تريد تحقيقه؟</label>
+        <textarea id="f-goal" rows="3" placeholder="مثال: أريد معرفة أفضل العملاء، تحسين الحملات، أو ترتيب بيانات المبيعات"></textarea>
+      </div>
+      <button type="submit" class="btn btn-gold">
+        <svg viewBox="0 0 32 32" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M16.02 3.2A12.72 12.72 0 0 0 5.13 22.5L3.2 29l6.67-1.78A12.74 12.74 0 1 0 16.02 3.2Zm0 2.31a10.43 10.43 0 0 1 8.84 15.99 10.43 10.43 0 0 1-13.87 3.56l-.48-.28-3.96 1.06 1.07-3.84-.31-.5A10.42 10.42 0 0 1 16.02 5.5Zm-4.5 5.46c-.22 0-.58.08-.88.42-.3.33-1.16 1.13-1.16 2.76 0 1.62 1.19 3.19 1.35 3.41.16.22 2.3 3.68 5.67 5.02 2.8 1.12 3.37.9 3.98.84.6-.06 1.96-.8 2.24-1.58.28-.78.28-1.45.2-1.58-.09-.14-.31-.22-.65-.39-.34-.17-1.96-.97-2.27-1.08-.3-.11-.53-.17-.75.17-.22.34-.86 1.08-1.05 1.3-.2.22-.39.25-.72.08-.34-.17-1.42-.52-2.7-1.66-1-.89-1.68-1.99-1.87-2.33-.2-.34-.02-.52.15-.69.15-.15.34-.39.5-.58.17-.2.22-.34.34-.56.11-.22.06-.42-.03-.58-.08-.17-.75-1.8-1.02-2.46-.27-.65-.54-.56-.75-.57h-.57Z"/></svg>
+        إرسال الطلب عبر واتساب
+      </button>
+    </form>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap footer-row">
+    <p>بصيرة البيانات — تحليل بيانات يساعدك على إيجاد العملاء المناسبين.</p>
+    <ul class="footer-nav">
+      <li><a href="#home">الرئيسية</a></li>
+      <li><a href="#services">الخدمات</a></li>
+      <li><a href="#pricing">الباقات</a></li>
+      <li><a href="#why">لماذا نحن</a></li>
+      <li><a href="#faq">الأسئلة</a></li>
+      <li><a href="#contact">تواصل</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+  // Mobile nav toggle
+  const toggle = document.getElementById('menuToggle');
+  const nav = document.getElementById('siteNav');
+  toggle.addEventListener('click', () => {
+    const open = nav.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  nav.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      nav.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  // Active nav link on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('nav.primary a');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(l => l.classList.remove('is-active'));
+        const active = document.querySelector(`nav.primary a[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('is-active');
+      }
+    });
+  }, { rootMargin: '-45% 0px -50% 0px' });
+  sections.forEach(s => observer.observe(s));
+
+  // Contact form -> route to WhatsApp with prefilled message
+  function handleSubmit(e){
+    e.preventDefault();
+    const name = document.getElementById('f-name').value.trim();
+    const type = document.getElementById('f-type').value.trim();
+    const contact = document.getElementById('f-contact').value.trim();
+    const goal = document.getElementById('f-goal').value.trim();
+    let msg = `مرحبًا، أنا ${name || ''}.`;
+    if (type) msg += ` نوع مشروعي: ${type}.`;
+    if (contact) msg += ` طريقة التواصل: ${contact}.`;
+    if (goal) msg += ` الهدف: ${goal}.`;
+    const url = 'https://wa.me/9647838927373?text=' + encodeURIComponent(msg);
+    window.open(url, '_blank');
+    return false;
+  }
+</script>
+
+</body>
+</html>
